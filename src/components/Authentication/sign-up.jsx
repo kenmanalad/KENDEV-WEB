@@ -3,36 +3,39 @@ import { useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 const SignUp = () => {
 
+    //States
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
-    const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
-
     const handleSignUp = async(e) => {
         e.preventDefault();
         try{
-            const response = await fetch("http://localhost:3030/register",
-                {
-                    method:'POST',
-                    headers:{
-                        "Content-Type": 'application/json'
-                    },
-                    body:JSON.stringify({
-                       email: email,
-                       password: password 
-                    })
-                }
-            )
-            if(response.ok){
-                const data = await response.json();
-                if(data.success){
-                    navigate("/sign-in")
+            if(password){
+                const response = await fetch("http://localhost:3030/register",
+                    {
+                        method:'POST',
+                        headers:{
+                            "Content-Type": 'application/json'
+                        },
+                        body:JSON.stringify({
+                           email: email,
+                           password: password 
+                        })
+                    }
+                )
+                if(response.ok){
+                    const data = await response.json();
+                    if(data.success){
+                        navigate("/sign-in")
+                    }
+                }else{
+                    setErrorMessage("Email was used already!");
                 }
             }else{
-                setErrorMessage("Email was used already!");
+                setErrorMessage("Enter a password");
             }
             
         }catch(error){
@@ -41,6 +44,7 @@ const SignUp = () => {
         }
     }
 
+    const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
 
     return (
         <div className="bg-gray-200 fixed h-screen w-screen flex items-center justify-center">
@@ -97,7 +101,7 @@ const SignUp = () => {
                     <button 
                         type="submit"
                         className="items-center w-80 h-10 bg-sky-500 text-white rounded-lg cursor-pointer"
-                        onClick={(e) => handleSignUp(e)}
+                        onClick={handleSignUp}
                     >
                         Sign Up
                     </button>

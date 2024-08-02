@@ -10,8 +10,27 @@ const SignIn = () => {
     const [password,setPassword] =useState("");
     const [errorMessage,setErrorMessage] = useState("");
 
+    const navigate = useNavigate();
+
+    //Email and Password authentication
     const handleSignIn = async(e) => {
         e.preventDefault();
+
+        if(!email && !password){
+            setErrorMessage("Must have an email address and password");
+            return;
+        }
+
+        if(!email){
+            setErrorMessage("Must have an email address");
+            return;
+        }
+
+        if(!password){
+            setErrorMessage("Must have a password");
+            return;
+        }
+
         try{
             const response = await fetch(
                 "http://localhost:3030/login",
@@ -42,11 +61,29 @@ const SignIn = () => {
             setErrorMessage("Bad Credentials");
         }
     }
+
+    //Google Authentication
+    const googleAuthRequest = async (e) => {
+        e.preventDefault();
+        try{
+            const response = await fetch(
+                "http://localhost:3030/google-request",
+                {
+                    method:"POST"
+                }
+            );
     
-    const navigate = useNavigate();
+            if(response.ok){
+                const data = await response.json();
+                window.location.href = data.url;    
+            }
+        }catch(error){
+            console.error("Error occured while requesting auth url");
+        }
+    }
 
     const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
-    const socialIconClass = "bg-gray-500 p-2 rounded-xl"
+    const socialIconClass = "bg-gray-500 p-2 rounded-xl cursor-pointer"
 
     return (
         <div className="bg-gray-200 fixed h-screen w-screen flex items-center justify-center">
@@ -54,6 +91,7 @@ const SignIn = () => {
                 <div className="w-80 text-center text-xl">
                     Login
                 </div>
+
                 {
                     errorMessage && 
                         <div 
@@ -64,7 +102,6 @@ const SignIn = () => {
                             {errorMessage}
                         </div>
                 }
-
 
 
                 {/* User Input/Credentials */}
@@ -94,7 +131,7 @@ const SignIn = () => {
                     <button 
                         type="submit"
                         className="items-center w-80 h-10 bg-sky-500 text-white rounded-lg cursor-pointer"
-                        onClick={(e) => handleSignIn(e)}
+                        onClick={handleSignIn}
                     >
                         Login
                     </button>
@@ -108,22 +145,36 @@ const SignIn = () => {
 
                 {/* Social Networks */}
                 <div className="w-80 flex justify-evenly items-center">
-                   <div className={socialIconClass}>
+
+                   <div 
+                        className={socialIconClass}
+                        onClick={googleAuthRequest}
+                    >
                         <FaGoogle className="text-white" size={25}/>
                    </div>
-                   <div className={socialIconClass}>
+
+                   <div 
+                        className={socialIconClass}
+                    >
                         <FaGithub className="text-white" size={25} />
                    </div>
-                   <div className={socialIconClass}>
+
+                   <div 
+                        className={socialIconClass}
+                    >
                         <FaFacebook className="text-white" size={25}/>
                    </div>
-                   <div className={socialIconClass}>
+
+                   <div 
+                        className={socialIconClass}
+                    >
                         <FaLinkedin className="text-white" size={25}/>
                    </div>
+
                 </div>
+                {/* End of Social Networks */}
+
                 <br />
-
-
 
                 <div>
                     <div className="flex items-center justify-center">
