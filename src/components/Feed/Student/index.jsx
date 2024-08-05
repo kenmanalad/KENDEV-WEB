@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 const StudentPage = () => {
+
     //jwt tokens
-    const token = localStorage.getItem("token");
+    const [token, setToken] = useState(localStorage.getItem("token"));
     const oauthToken = Cookies.get("token");
 
     //States
-    const [message,setMessage] = useState("Hello");
+    const [message,setMessage] = useState("");
 
     const navigate = useNavigate();
 
@@ -18,6 +19,7 @@ const StudentPage = () => {
         }
         else if(!token && oauthToken){
             localStorage.setItem("token",oauthToken);
+            setToken(oauthToken);
         }
     },[]);
 
@@ -26,12 +28,13 @@ const StudentPage = () => {
             const response = await fetch("http://localhost:3030/hello", {
                 method:"GET",
                 headers:{
-                    Authorization: `Bearer ${token ?? oauthToken}`
+                    Authorization: `Bearer ${token}`
                 }
             });
 
             if(response.ok){
                 const data = await response.json();
+                
                 setMessage(data.message);
             }
         }catch(error){
