@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaGoogle, FaGithub, FaFacebook, FaLinkedin } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -9,10 +9,11 @@ const SignIn = () => {
     const [email,setEmail] =useState("");
     const [password,setPassword] =useState("");
     const [errorMessage,setErrorMessage] = useState("");
-
+    const [ token, setToken ] = useState();
+    const [code, setCode] = useState();
     const navigate = useNavigate();
 
-    //Email and Password authentication
+    //Email and Password Authentication
     const handleSignIn = async(e) => {
         e.preventDefault();
 
@@ -81,6 +82,64 @@ const SignIn = () => {
             console.error("Error occured while requesting auth url");
         }
     }
+
+    //Github Authentication
+    const githubAuthRequest = (e) => {
+        
+        e.preventDefault();
+
+        window.location.assign(import.meta.env.VITE_GITHUB_AUTH_REQUEST_URL);
+
+    }
+
+    const handleGithubUserData = async(code) => {
+        try{
+            const response = await fetch("http://localhost:3030/getGithubUserData",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({ code })
+            });
+
+            if(response.ok){
+
+                const data = await response.json();
+
+                setToken(data.token);
+
+                localStorage.setItem("token",data.token);
+
+                localStorage.setItem("user_id", data.id);
+
+                navigate("/student-feed");
+
+            }
+
+        }catch(error){
+
+        }
+    }
+
+    useEffect(
+        () => 
+            {
+
+                const urlParams = new URLSearchParams(window.location.search);
+
+                const codeFromUrl = urlParams.get('code');
+
+                if(codeFromUrl && codeFromUrl !==code){
+                    setCode(codeFromUrl);
+                }
+
+                if(!token && codeFromUrl){
+                    handleGithubUserData(codeFromUrl);
+                }
+            }
+            , [token]
+    );
+
 
     const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
     const socialIconClass = "bg-gray-500 p-2 rounded-xl cursor-pointer"
@@ -155,6 +214,7 @@ const SignIn = () => {
 
                    <div 
                         className={socialIconClass}
+                        onClick={githubAuthRequest}
                     >
                         <FaGithub className="text-white" size={25} />
                    </div>

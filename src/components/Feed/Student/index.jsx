@@ -4,7 +4,7 @@ import Cookies from "js-cookie"
 const StudentPage = () => {
 
     //jwt tokens
-    const [token, setToken] = useState(localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
     const oauthToken = Cookies.get("token");
 
     //States
@@ -12,24 +12,30 @@ const StudentPage = () => {
 
     const navigate = useNavigate();
 
+    const githubAuthRequest = () => {
+        window.location.assign(process.env.GITHUB_AUTH_REQUEST_URL);
+    }
+
     //Check tokens
     useEffect(() =>{
+        
         if(!token && !oauthToken){
             navigate("/sign-in");
         }
         else if(!token && oauthToken){
             localStorage.setItem("token",oauthToken);
-            setToken(oauthToken);
         }
-    },[]);
+    },[token,oauthToken]);
 
     const handleFetch = async() => {
         try{
+            console.log(token);
+            console.log(oauthToken);
             const response = await fetch("http://localhost:3030/hello", {
                 method:"GET",
                 headers:{
-                    Authorization: `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token ?? oauthToken}`
+                },
             });
 
             if(response.ok){
