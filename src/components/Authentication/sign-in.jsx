@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useRef} from "react";
 import { FaGoogle, FaGithub, FaFacebook, FaLinkedin } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -9,9 +9,10 @@ const SignIn = () => {
     const [email,setEmail] =useState("");
     const [password,setPassword] =useState("");
     const [errorMessage,setErrorMessage] = useState("");
-    const [ token, setToken ] = useState();
-    const [code, setCode] = useState();
+    const authType = localStorage.getItem("authType");
+
     const navigate = useNavigate();
+
 
     //Email and Password Authentication
     const handleSignIn = async(e) => {
@@ -76,22 +77,24 @@ const SignIn = () => {
     
             if(response.ok){
                 const data = await response.json();
+                localStorage.setItem("authType","google");
                 window.location.href = data.url;    
             }
         }catch(error){
             console.error("Error occured while requesting auth url");
+            setErrorMessage("Google Authentication invalid: Try another account");
         }
     }
 
-    //Github Authentication
-    const githubAuthRequest = (e) => {
-        
+    const socialAuthRequest = (e, auth, req_url) => {
         e.preventDefault();
 
-        window.location.assign(import.meta.env.VITE_GITHUB_AUTH_REQUEST_URL);
+        localStorage.setItem("authType",auth);
 
+        window.location.assign(req_url);    
     }
 
+    //Github Authentication Request
     const handleGithubUserData = async(code) => {
         try{
             const response = await fetch("http://localhost:3030/getGithubUserData",{
@@ -102,11 +105,11 @@ const SignIn = () => {
                 body: JSON.stringify({ code })
             });
 
+
+            const data = await response.json();
+
             if(response.ok){
 
-                const data = await response.json();
-
-                setToken(data.token);
 
                 localStorage.setItem("token",data.token);
 
@@ -115,12 +118,62 @@ const SignIn = () => {
                 navigate("/student-feed");
 
             }
+            else{
+                setErrorMessage(data.errMessage);
+            }
 
         }catch(error){
-
+            console.error("Error occured during Github user data fetch" + error);
+            setErrorMessage("Unable to complete request. Please try again later");
         }
     }
 
+    //LinkedIn Authentication Request
+    const handleLinkedInUserData = async(code) => {
+        try{
+            const response = await fetch("http://localhost:3030/getLinkedInUserData",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({ code : code })
+            });
+
+            const data = await response.json();
+
+            if(response.ok){
+
+
+                localStorage.setItem("token",data.token);
+
+                localStorage.setItem("user_id", data.id);
+
+                navigate("/student-feed");
+
+                console.log(data);
+
+            }
+            else{
+
+                const url = new URL(window.location);
+
+                url.search = '';
+                
+                window.history.replaceState({}, document.title, url);
+
+                setErrorMessage(data.message);
+                
+            }
+
+
+        }catch(error){
+            console.error("Error occured during LinkedIn user data fetch" + error);
+            setErrorMessage("Unable to complete request. Please try again later");
+        }
+    }
+
+
+    
     useEffect(
         () => 
             {
@@ -129,16 +182,24 @@ const SignIn = () => {
 
                 const codeFromUrl = urlParams.get('code');
 
-                if(codeFromUrl && codeFromUrl !==code){
-                    setCode(codeFromUrl);
+
+                console.log("processing social network auth");
+                if(codeFromUrl && authType){
+                    console.log("Finding right auth type");
+                    switch(authType){
+                        case "github":
+                            handleGithubUserData(codeFromUrl);
+                            break;
+                        case "linkedin":
+                            handleLinkedInUserData(codeFromUrl)
+                            break;
+                    }
                 }
 
-                if(!token && codeFromUrl){
-                    handleGithubUserData(codeFromUrl);
-                }
             }
-            , [token]
+            , []
     );
+
 
 
     const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
@@ -147,8 +208,10 @@ const SignIn = () => {
     return (
         <div className="bg-gray-200 fixed h-screen w-screen flex items-center justify-center">
             <div className="bg-white flex-col justify-center items-center p-12 rounded-md">
-                <div className="w-80 text-center text-xl">
-                    Login
+                <div className="w-full flex justify-center items-center">
+                    <div className="w-80 text-center text-xl">
+                        Login
+                    </div>
                 </div>
 
                 {
@@ -165,7 +228,7 @@ const SignIn = () => {
 
                 {/* User Input/Credentials */}
                 <div className="flex-col justify-around py-4">
-                    <div className="flex items-center pb-2">
+                    <div className="flex items-center justify-center pb-2">
                         <input 
                             type="email"
                             placeholder="Email Address" 
@@ -175,7 +238,7 @@ const SignIn = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-center ">
                         <input 
                             type="password"
                             placeholder="Password" 
@@ -203,34 +266,32 @@ const SignIn = () => {
 
 
                 {/* Social Networks */}
-                <div className="w-80 flex justify-evenly items-center">
+                <div className="w-full flex justify-center items-center">
+                    <div className="w-60 flex justify-evenly items-center">
 
-                   <div 
-                        className={socialIconClass}
-                        onClick={googleAuthRequest}
-                    >
-                        <FaGoogle className="text-white" size={25}/>
-                   </div>
+                        <div 
+                            className={socialIconClass}
+                            onClick={googleAuthRequest}
+                        >
+                            <FaGoogle className="text-white" size={25}/>
+                        </div>
 
-                   <div 
-                        className={socialIconClass}
-                        onClick={githubAuthRequest}
-                    >
-                        <FaGithub className="text-white" size={25} />
-                   </div>
+                        <div 
+                            className={socialIconClass}
+                            onClick={(e) => socialAuthRequest(e,"github",import.meta.env.VITE_GITHUB_AUTH_REQUEST_URL)}
+                        >
+                            <FaGithub className="text-white" size={25} />
+                        </div>
 
-                   <div 
-                        className={socialIconClass}
-                    >
-                        <FaFacebook className="text-white" size={25}/>
-                   </div>
 
-                   <div 
-                        className={socialIconClass}
-                    >
-                        <FaLinkedin className="text-white" size={25}/>
-                   </div>
+                        <div 
+                            className={socialIconClass}
+                            onClick={(e) => socialAuthRequest(e,"linkedin",import.meta.env.VITE_LINKEDIN_AUTH_REQUEST_URL)}
+                        >
+                            <FaLinkedin className="text-white" size={25}/>
+                        </div>
 
+                    </div>
                 </div>
                 {/* End of Social Networks */}
 
