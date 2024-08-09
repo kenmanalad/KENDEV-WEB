@@ -13,29 +13,41 @@ const SignUp = () => {
     const handleSignUp = async(e) => {
         e.preventDefault();
         try{
-            if(password){
-                const response = await fetch("http://localhost:3030/register",
-                    {
-                        method:'POST',
-                        headers:{
-                            "Content-Type": 'application/json'
-                        },
-                        body:JSON.stringify({
-                           email: email,
-                           password: password 
-                        })
-                    }
-                )
-                if(response.ok){
-                    const data = await response.json();
-                    if(data.success){
-                        navigate("/sign-in")
-                    }
-                }else{
-                    setErrorMessage("Email was used already!");
+
+            if(!email && !password){
+                setErrorMessage("Please enter your email address and password to proceed");
+                return;
+            }
+            if(!email){
+                setErrorMessage("Please enter your email address to proceed");
+                return;
+            }
+            if(!password){
+                setErrorMessage("Please enter your password to proceed");
+                return;
+            }
+
+            const response = await fetch("http://localhost:3030/register",
+                {
+                    method:'POST',
+                    headers:{
+                        "Content-Type": 'application/json'
+                    },
+                    body:JSON.stringify({
+                       email: email,
+                       password: password 
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if(response.ok){
+                if(data.success){
+                    navigate("/sign-in")
                 }
             }else{
-                setErrorMessage("Enter a password");
+                setErrorMessage(data.message);
             }
             
         }catch(error){
@@ -49,8 +61,10 @@ const SignUp = () => {
     return (
         <div className="bg-gray-200 fixed h-screen w-screen flex items-center justify-center">
             <div className="bg-white flex-col justify-center items-center p-12 rounded-md">
-                <div className="w-80 text-center text-xl">
-                    Sign Up
+                <div className="w-full flex justify-center items-center">
+                    <div className="w-80 text-center text-xl">
+                        Sign Up
+                    </div>
                 </div>
                 {
                     errorMessage && 
@@ -58,12 +72,16 @@ const SignUp = () => {
                             className="flex items-center text-center justify-center p-2 text-red-500 rounded-sm text-sm"
                             aria-live="polite"
                         >
-                            <MdError className="mr-1"/>
-                            {errorMessage}
+                            <div className="flex justify-center items-center">
+                                <MdError className="mr-1"/>
+                            </div>
+                            <div className="w-80 flex justify-center items-center">
+                                {errorMessage}
+                            </div>
                         </div>
                 }
-                <div className="flex-col justify-around py-4">
-                    <div className="flex items-center pb-3">
+                <div className="w-full flex-col justify-around py-4">
+                    <div className="flex justify-center items-center pb-3">
                         <input 
                             type="email"
                             placeholder="Email Address"
@@ -75,7 +93,7 @@ const SignUp = () => {
                             }
                         />
                     </div>
-                    <div className="flex items-center pb-3">
+                    <div className="flex justify-center items-center pb-3">
                         <input 
                             type="password"
                             placeholder="Password"

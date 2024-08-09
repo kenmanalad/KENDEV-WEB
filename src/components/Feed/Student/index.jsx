@@ -6,15 +6,13 @@ const StudentPage = () => {
     //jwt tokens
     const token = localStorage.getItem("token");
     const oauthToken = Cookies.get("token");
+    const id = Cookies.get("id");
+    const authType = localStorage.getItem("authType");
 
     //States
     const [message,setMessage] = useState("");
 
     const navigate = useNavigate();
-
-    const githubAuthRequest = () => {
-        window.location.assign(process.env.GITHUB_AUTH_REQUEST_URL);
-    }
 
     //Check tokens
     useEffect(() =>{
@@ -22,19 +20,22 @@ const StudentPage = () => {
         if(!token && !oauthToken){
             navigate("/sign-in");
         }
+
         else if(!token && oauthToken){
             localStorage.setItem("token",oauthToken);
+            localStorage.setItem("id",id)
         }
-    },[token,oauthToken]);
+    },[token]);
 
     const handleFetch = async() => {
         try{
-            console.log(token);
-            console.log(oauthToken);
+            // console.log(token);
+            // console.log(oauthToken);
+            console.log(authType);
             const response = await fetch("http://localhost:3030/hello", {
                 method:"GET",
                 headers:{
-                    Authorization: `Bearer ${token ?? oauthToken}`
+                    Authorization: `Bearer ${authType === "google" ?  oauthToken : token}`
                 },
             });
 
