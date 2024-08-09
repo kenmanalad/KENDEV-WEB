@@ -13,29 +13,53 @@ const SignIn = () => {
 
     const navigate = useNavigate();
 
+    // Shared functions
+    const socialAuthRequest = (e, auth, req_url) => {
+        e.preventDefault();
+
+        localStorage.setItem("authType",auth);
+
+        window.location.assign(req_url);    
+    }
+
+    const redirectToDestination = (data, destination) => {
+
+        if(!data){
+            setErrorMessage("Unable to process request: Please try again later.");
+            throw new Error("Failed to receive enough data from API Request.");
+        }
+
+        localStorage.setItem("token",data.token);
+
+        localStorage.setItem("user_id", data.id);
+
+        navigate(destination);
+
+    }
+    // End of shared functions
 
     //Email and Password Authentication
     const handleSignIn = async(e) => {
         e.preventDefault();
 
         if(!email && !password){
-            setErrorMessage("Must have an email address and password");
+            setErrorMessage("Please enter your email address and password to proceed");
             return;
         }
 
         if(!email){
-            setErrorMessage("Must have an email address");
+            setErrorMessage("Please enter your email address to proceed");
             return;
         }
 
         if(!password){
-            setErrorMessage("Must have a password");
+            setErrorMessage("Please enter your email address to proceed");
             return;
         }
 
         try{
             const response = await fetch(
-                "http://localhost:3030/login",
+                import.meta.env.VITE_SIGN_IN_URL,
                 {
                     method: "POST",
                     headers:{
@@ -49,18 +73,19 @@ const SignIn = () => {
 
             );
 
+            const data = await response.json();
+
             if(response.ok){
-                const data = await response.json();
-                if(data.message == "ok"){
-                    localStorage.setItem("token",data.token);
-                    navigate("/student-feed");
-                }
+
+                localStorage.setItem("authType","manual");
+                redirectToDestination(data,"/student-feed");
+
             }else{
-                setErrorMessage("Your email address/password is incorrect");
+                setErrorMessage(data.message);
             }
         }catch(error){
             console.error("An error occured during signing in process",error);
-            setErrorMessage("Bad Credentials");
+            setErrorMessage("Umable to process authentication request: Please try again later.");
         }
     }
 
@@ -69,7 +94,7 @@ const SignIn = () => {
         e.preventDefault();
         try{
             const response = await fetch(
-                "http://localhost:3030/google-request",
+                import.meta.env.VITE_GOOGLE_AUTH_REQUEST_URL,
                 {
                     method:"POST"
                 }
@@ -86,18 +111,11 @@ const SignIn = () => {
         }
     }
 
-    const socialAuthRequest = (e, auth, req_url) => {
-        e.preventDefault();
-
-        localStorage.setItem("authType",auth);
-
-        window.location.assign(req_url);    
-    }
 
     //Github Authentication Request
     const handleGithubUserData = async(code) => {
         try{
-            const response = await fetch("http://localhost:3030/getGithubUserData",{
+            const response = await fetch(import.meta.env.VITE_GITHUB_GET_USER_DATA_URL,{
                 method:"POST",
                 headers:{
                     "Content-Type":"application/json"
@@ -110,12 +128,7 @@ const SignIn = () => {
 
             if(response.ok){
 
-
-                localStorage.setItem("token",data.token);
-
-                localStorage.setItem("user_id", data.id);
-
-                navigate("/student-feed");
+                redirectToDestination(data,"/student-feed");
 
             }
             else{
@@ -128,10 +141,11 @@ const SignIn = () => {
         }
     }
 
+
     //LinkedIn Authentication Request
     const handleLinkedInUserData = async(code) => {
         try{
-            const response = await fetch("http://localhost:3030/getLinkedInUserData",{
+            const response = await fetch(import.meta.env.VITE_LINKEDIN_GET_USER_DATA_URL,{
                 method:"POST",
                 headers:{
                     "Content-Type":"application/json"
@@ -144,13 +158,8 @@ const SignIn = () => {
             if(response.ok){
 
 
-                localStorage.setItem("token",data.token);
+                redirectToDestination(data,"/student-feed");
 
-                localStorage.setItem("user_id", data.id);
-
-                navigate("/student-feed");
-
-                console.log(data);
 
             }
             else{
