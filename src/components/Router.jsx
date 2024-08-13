@@ -7,6 +7,7 @@ import SignIn from "./Authentication/sign-in"
 import SignUp from "./Authentication/sign-up";
 import StudentPage from "./Feed/Student";
 import LandingPage from "./Landing";
+import Profile from "./Authentication/profile";
 
 export const Routers = () => {
     return (
@@ -14,6 +15,7 @@ export const Routers = () => {
             <Routes>
                 <Route path="/sign-in" Component={SignIn} />
                 <Route path="/sign-up" Component={SignUp} />
+                <Route path="/profile" Component={Profile}/>
                 <Route path="/student-feed" Component={StudentPage}/> 
                 <Route path="/" Component={LandingPage}/>  
             </Routes>
