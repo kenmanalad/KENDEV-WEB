@@ -75,10 +75,15 @@ const SignIn = () => {
 
             const data = await response.json();
 
+            console.log(data.profile);
             if(response.ok){
-
                 localStorage.setItem("authType","manual");
-                redirectToDestination(data,"/student-feed");
+                if(data.profile){
+                    redirectToDestination(data,"/student-feed");
+                }
+                else{
+                    redirectToDestination(data,"/profile");
+                }
 
             }else{
                 setErrorMessage(data.message);

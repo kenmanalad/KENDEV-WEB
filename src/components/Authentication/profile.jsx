@@ -1,48 +1,54 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
-const SignUp = () => {
+const Profile = () => {
+
+    //local storage
+    const token = localStorage.getItem("token");
+    const user_id = localStorage.getItem("user_id");
+
 
     //States
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword,setConfirmPassword] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [file, setFile] = useState(null);
+    const [fileName, setFileName] = useState("");
+    const [fileLocation, setFileLocation] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
-    const handleSignUp = async(e) => {
+    //Profile Registration
+    const handleProfileRegistration = async(e) => {
         e.preventDefault();
         try{
 
-            if(!email && !password){
-                setErrorMessage("Please enter your email address and password to proceed");
+            if(!firstName && !lastName){
+                setErrorMessage("Please enter your first name and last name to proceed");
                 return;
             }
-            if(!email){
-                setErrorMessage("Please enter your email address to proceed");
+            if(!firstName){
+                setErrorMessage("Please enter your first name to proceed");
                 return;
             }
-            if(!password){
-                setErrorMessage("Please enter your password to proceed");
-                return;
-            }
-
-            if(password !== confirmPassword){
-                setErrorMessage("Password and Confirm Password do not match.");
+            if(!lastName){
+                setErrorMessage("Please enter your last name to proceed");
                 return;
             }
 
 
-            const response = await fetch("http://localhost:3030/register",
+
+            const response = await fetch("http://localhost:3030/profile-registration",
                 {
                     method:'POST',
                     headers:{
-                        "Content-Type": 'application/json'
+                        "Content-Type": 'application/json',
+                        Authorization: `Bearer ${token}`
                     },
                     body:JSON.stringify({
-                       email: email,
-                       password: password
+                       firstName: firstName,
+                       lastName: lastName,
+                       user_id: user_id
                     })
                 }
             );
@@ -63,6 +69,12 @@ const SignUp = () => {
         }
     }
 
+    //Handle Profile Pic
+    const handleFileChange = (e) => {
+        const selectedFiles = e.target.files[0];
+        setFile(selectedFiles);
+    }
+
     const inputClass = "bg-gray-100 w-80 h-10 rounded-sm shadow-sm shadow-gray-200 p-4";
 
     const divInputSytle = "flex justify-center items-center pb-3"
@@ -72,7 +84,7 @@ const SignUp = () => {
             <div className="bg-white flex-col justify-center items-center p-12 rounded-md">
                 <div className="w-full flex justify-center items-center">
                     <div className="w-80 text-center text-xl">
-                        Sign Up
+                        Profile Registration
                     </div>
                 </div>
                 {
@@ -92,37 +104,23 @@ const SignUp = () => {
                 <div className="w-full flex-col justify-around py-4">
                     <div className={divInputSytle}>
                         <input 
-                            type="email"
-                            placeholder="Email Address....."
-                            name="email"
-                            id="email" 
+                            placeholder="First Name....."
+                            name="firstName"
+                            id="firstName" 
                             className={inputClass}
                             onChange={(e)=> 
-                                setEmail(e.target.value)
+                                setFirstName(e.target.value)
                             }
                         />
                     </div>
                     <div className={divInputSytle}>
                         <input 
-                            type="password"
-                            placeholder="Password....."
-                            name="password"
-                            id="password" 
+                            placeholder="Last Name....."
+                            name="lastName"
+                            id="lastName" 
                             className={inputClass}
                             onChange={(e)=> 
-                                setPassword(e.target.value)
-                            }
-                        />
-                    </div>
-                    <div className={divInputSytle}>
-                        <input 
-                            type="password"
-                            placeholder="Confirm Password....." 
-                            name="confirm-password" 
-                            id="confirm-password" 
-                            className={inputClass}
-                            onChange={(e)=> 
-                                setConfirmPassword(e.target.value)
+                                setLastName(e.target.value)
                             }
                         />
                     </div>
@@ -131,29 +129,14 @@ const SignUp = () => {
                     <button 
                         type="submit"
                         className="items-center w-80 h-10 bg-sky-500 text-white rounded-lg cursor-pointer"
-                        onClick={handleSignUp}
+                        onClick={handleProfileRegistration}
                     >
-                        Sign Up
+                        Register
                     </button>
-                </div>
-                <div className="flex items-center justify-center pt-2">
-                    <div className="flex items-center justify-center">
-                        <div className="flex items-center justify-center text-sm pr-1">
-                            Already have an account? 
-                        </div>
-                        <div 
-                            className="flex items-center justify-center text-sm text-sky-500 cursor-pointer"
-                            onClick={() => {
-                                navigate("/sign-in")
-                            }}
-                        >
-                            Log in
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-export default SignUp;
+export default Profile;
