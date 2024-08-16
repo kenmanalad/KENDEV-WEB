@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+import { ImFilePicture } from "react-icons/im";
+import { Flag, Segment } from 'semantic-ui-react'
 const Profile = () => {
 
     //local storage
@@ -37,19 +39,21 @@ const Profile = () => {
             }
 
 
+            const formData = new FormData();
+
+            //This can be null
+            formData.append("profilePic",file);
+            formData.append("firstName",firstName);
+            formData.append("lastName", lastName);
+            formData.append("user_id", user_id)
 
             const response = await fetch("http://localhost:3030/profile-registration",
                 {
                     method:'POST',
                     headers:{
-                        "Content-Type": 'application/json',
                         Authorization: `Bearer ${token}`
                     },
-                    body:JSON.stringify({
-                       firstName: firstName,
-                       lastName: lastName,
-                       user_id: user_id
-                    })
+                    body:formData
                 }
             );
 
@@ -123,6 +127,43 @@ const Profile = () => {
                                 setLastName(e.target.value)
                             }
                         />
+                    </div>
+
+                    <div className={divInputSytle}>
+                        <label htmlFor="profilePic" className="bg-gray-400 text-white w-72 rounded-sm shadow-sm shadow-gray-200 p-4 flex items-center justify-center cursor-pointer">
+                            
+                            <div className="flex justify-around items-center ">
+                            <   ImFilePicture /> {file ? file.name : 'Click to Choose Profile Picture'}
+                            </div>
+
+                            <input
+                                type="file"
+                                name="profilePic"
+                                id="profilePic"
+                                className="hidden"
+                                onChange={handleFileChange}
+                            />
+                        </label>
+                    </div>
+                    <div className={divInputSytle}>
+                        <div className="w-full flex justify-center items-center space-x-2">
+                            <select 
+                                name="countryCode" 
+                                id="countryCode"
+                                className="bg-gray-100 flex w-16 justify-center items-center p-1"
+                            >
+                                <option value="+63">
+                                    +63  
+                                </option>
+                            </select>
+                            <input 
+                                type="number"
+                                placeholder="Cellphone Number....."
+                                name="cpNumber"
+                                id="cpNumber" 
+                                className="bg-gray-100 w-48  rounded-sm shadow-sm shadow-gray-200 p-4"
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center justify-center">
