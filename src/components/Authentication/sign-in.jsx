@@ -2,6 +2,7 @@ import { useState, useEffect ,useRef} from "react";
 import { FaGoogle, FaGithub, FaFacebook, FaLinkedin } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie"
 
 const SignIn = () => {
 
@@ -107,6 +108,9 @@ const SignIn = () => {
     
             if(response.ok){
                 const data = await response.json();
+                if(!data.url){
+                    setErrorMessage(data.message)
+                }
                 localStorage.setItem("authType","google");
                 window.location.href = data.url;    
             }
@@ -212,6 +216,18 @@ const SignIn = () => {
 
             }
             , []
+    );
+
+    //Retrieve error messages from previous routes
+    useEffect(
+        () =>
+        {
+            const message = Cookies.get("message");
+            if(message){
+                setErrorMessage(message);
+            }
+        }
+        ,[]
     );
 
 
