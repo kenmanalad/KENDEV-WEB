@@ -7,7 +7,7 @@ import SignIn from "./Authentication/sign-in"
 import SignUp from "./Authentication/sign-up";
 import StudentPage from "./Feed/Student";
 import LandingPage from "./Landing";
-import Profile from "./Authentication/profile";
+import Profile from "./Profile/profile";
 
 export const Routers = () => {
     return (
