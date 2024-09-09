@@ -93,7 +93,7 @@ const Profile = () => {
 
             if(response.ok){
                 if(data.success){
-                    navigate("/sign-in")
+                    navigate("/profile")
                 }
             }else{
                 setErrorMessage(data.message);
