@@ -83,7 +83,7 @@ const SignIn = () => {
                     redirectToDestination(data,"/student-feed");
                 }
                 else{
-                    redirectToDestination(data,"/profile");
+                    redirectToDestination(data,"/profile-registration");
                 }
 
             }else{
