@@ -54,6 +54,7 @@ const Profile = () => {
 
             const data = await response.json();
             if(response.ok){
+                console.log(data);
                 return data;     
             }else{
                 handleError(data);
@@ -79,13 +80,22 @@ const Profile = () => {
     );
 
     return(
-        <div className="flex justify-content items-center">
+        <div className="flex justify-content items-center w-full h-full p-12">
             {
                 profile && 
-                    <div>
-                        {
-                          `${profile.firstName} ${profile.lastName}`
-                        }
+                    <div className="p-12 rounded shadow w-full">
+                        <div className="w-24 h-24 shadow">
+                            <img 
+                                src={`http://localhost:3030${profile.imgUrl}`} 
+                                alt="No profile picture found" 
+                                className="w-24 h-24 rounded-lg"    
+                            />
+                        </div>
+                        <div className="">
+                            {
+                                `${profile.firstName} ${profile.lastName}`
+                            }
+                        </div>
                     </div>
             }
         </div>
