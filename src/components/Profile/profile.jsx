@@ -1,4 +1,7 @@
 import { useEffect, useState , useCallback} from "react";
+import { MdVerified } from "react-icons/md";
+import { TiUserAdd } from "react-icons/ti";
+import { FaMessage } from "react-icons/fa6";
 
 const Profile = () => {
 
@@ -10,6 +13,7 @@ const Profile = () => {
     //States
     const [profile, setProfile] = useState();
     const [errorMessage, setErrorMessage] = useState();
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
     
     //Error handling for fetching profile details
@@ -73,28 +77,116 @@ const Profile = () => {
         () => 
             {
                 fetchProfileDetails();
-
             }
         ,
         []
     );
 
+  //Dynamically changes the screenwidth
+  useEffect(() => 
+    {
+
+        const handleResize = () => {
+            setScreenWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, 
+    []
+    );
+
+
+    console.log(screenWidth);
+
+    const profileDivStyle = "flex justify-evenly p-4 rounded shadow w-2/5";
+
+    const profilePicStyle = "w-3/4 h-48 rounded-lg shadow"
+
     return(
-        <div className="flex justify-content items-center w-full h-full p-12">
+        <div 
+            className="flex justify-center items-center w-full h-full p-12"
+            style={{
+                fontFamily: "montserrat"
+            }}
+        >
             {
                 profile && 
-                    <div className="p-12 rounded shadow w-full">
-                        <div className="w-24 h-24 shadow">
+                    <div 
+                        className={profileDivStyle}
+                    >
+                        <div 
+                            className="w-1/2 flex justify-center"
+                        >
                             <img 
                                 src={`http://localhost:3030${profile.imgUrl}`} 
                                 alt="No profile picture found" 
-                                className="w-24 h-24 rounded-lg"    
+                                className={profilePicStyle}    
                             />
                         </div>
-                        <div className="">
-                            {
-                                `${profile.firstName} ${profile.lastName}`
-                            }
+                        <div 
+                            className="w-1/2 p-2"
+                        >
+                            <div
+                                className="text-2xl flex justify-center items-center"
+                            >
+                                {
+                                    `${profile.firstName} ${profile.lastName}`
+                                }
+                                <div className="text-gray-400">
+                                    <MdVerified size={15}/>
+                                </div>
+                            </div>
+                            <div
+                                className="text-sm italic flex justify-center items-center cursor-pointer"
+                            >
+                                Apprentice III
+                            </div>
+                            <div
+                                className="text-xs flex justify-center items-center text-blue-400 cursor-pointer"
+                            >
+                                Verify your account
+                            </div>
+
+
+                            <div
+                                className="text-sm"
+                            >
+                                {
+                                    profile.userType
+                                }
+                            </div>
+                            <div
+                                className="text-sm"
+                            >
+                                {
+                                    profile.school
+                                }
+                            </div>
+                            <div
+                                className="text-xs"
+                            >
+                               Bachelor of Science in Computer Science
+                            </div>
+                            <div
+                                className="text-sm flex pt-1 mt-1 space-x-2"
+                            >
+                               <div className="flex p-2 justify-evenly items-center text-white bg-blue-400 rounded-lg">
+                                    {/* <div className="">
+
+                                    </div> */}
+                                    <TiUserAdd />
+                                    Connect
+                               </div>
+                               <div className="flex p-2 justify-evenly items-center text-blue-400 bg-white rounded-lg shadow">
+                                    <FaMessage />
+                                    Message
+                               </div>
+                            </div>
                         </div>
                     </div>
             }
