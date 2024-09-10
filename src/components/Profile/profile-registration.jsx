@@ -118,7 +118,7 @@ const Profile = () => {
                 name: "UserType....."
             },
             {
-                value:"student",
+                value:"Student",
                 name:"Student"
             },
             {
