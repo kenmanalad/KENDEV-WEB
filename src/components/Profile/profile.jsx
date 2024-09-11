@@ -2,6 +2,7 @@ import { useEffect, useState , useCallback} from "react";
 import { MdVerified } from "react-icons/md";
 import { TiUserAdd } from "react-icons/ti";
 import { FaMessage } from "react-icons/fa6";
+import { profileDivStyle,profilePicStyle, profileNameStyle } from "./profile-styles";
 
 const Profile = () => {
 
@@ -103,13 +104,15 @@ const Profile = () => {
 
     console.log(screenWidth);
 
-    const profileDivStyle = "flex justify-evenly p-4 rounded shadow w-2/5";
+    // const profileDivStyle = "flex justify-evenly p-4 rounded shadow w-2/5 bg-white";
 
-    const profilePicStyle = "w-3/4 h-48 rounded-lg shadow"
+    const profileName = "text-2xl flex justify-center items-center"
+
+    // const profilePicStyle = "w-3/4 h-48 rounded-lg shadow"
 
     return(
         <div 
-            className="flex justify-center items-center w-full h-full p-12"
+            className="flex flex-col justify-center items-center w-full h-full p-12 bg-gray-50"
             style={{
                 fontFamily: "montserrat"
             }}
@@ -117,40 +120,45 @@ const Profile = () => {
             {
                 profile && 
                     <div 
-                        className={profileDivStyle}
+                        className={profileDivStyle(screenWidth)}
                     >
                         <div 
-                            className="w-1/2 flex justify-center"
+                            className={`${screenWidth < 885 ? "w-full": "w-1/2"} flex justify-center`}
                         >
                             <img 
                                 src={`http://localhost:3030${profile.imgUrl}`} 
                                 alt="No profile picture found" 
-                                className={profilePicStyle}    
+                                className={profilePicStyle(screenWidth)}    
                             />
                         </div>
                         <div 
-                            className="w-1/2 p-2"
+                            className={`${screenWidth < 885 ? "w-full": "w-1/2" } p-2`}
                         >
                             <div
-                                className="text-2xl flex justify-center items-center"
+                                className={profileNameStyle(screenWidth)}
                             >
                                 {
                                     `${profile.firstName} ${profile.lastName}`
                                 }
-                                <div className="text-gray-400">
+                                <div className={profile.isVerified ? "text-blue-600":"text-gray-400"}>
                                     <MdVerified size={15}/>
                                 </div>
                             </div>
                             <div
                                 className="text-sm italic flex justify-center items-center cursor-pointer"
                             >
-                                Apprentice III
+                                {
+                                    profile.level
+                                }
                             </div>
-                            <div
-                                className="text-xs flex justify-center items-center text-blue-400 cursor-pointer"
-                            >
-                                Verify your account
-                            </div>
+                            {
+                                !profile.isVerified &&
+                                    <div
+                                        className="text-xs flex justify-center items-center text-blue-400 cursor-pointer"
+                                    >
+                                        Verify your account
+                                    </div>
+                            }
 
 
                             <div
@@ -170,12 +178,14 @@ const Profile = () => {
                             <div
                                 className="text-xs"
                             >
-                               Bachelor of Science in Computer Science
+                               {
+                                    profile.collegeProgram
+                               }
                             </div>
                             <div
                                 className="text-sm flex pt-1 mt-1 space-x-2"
                             >
-                               <div className="flex p-2 justify-evenly items-center text-white bg-blue-400 rounded-lg">
+                               <div className="flex p-2 justify-evenly items-center text-white bg-blue-400 rounded-lg ">
                                     {/* <div className="">
 
                                     </div> */}
