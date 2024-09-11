@@ -30,6 +30,7 @@ const Profile = () => {
     const [nonITJob, setNonITJob] = useState();
     const [ITJob, setITJob] = useState();
     const [schoolYear,setSchoolYear] = useState();
+    const [collegeProgram, setCollegeProgram] = useState();
     const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
@@ -62,6 +63,16 @@ const Profile = () => {
                 return;
             }
 
+            if(!school){
+                setErrorMessage("Please enter a valid university/school");
+                return;
+            }
+
+            if(!collegeProgram){
+                setErrorMessage("Please state your college Program");
+                return;
+            }
+
 
             const formData = new FormData();
             console.log(userType);
@@ -77,7 +88,10 @@ const Profile = () => {
             formData.append("nonITCareer",nonITJob);
             formData.append("ITCareer",ITJob);
             formData.append("school",school);
-            formData.append("schoolYear",schoolYear)
+            formData.append("schoolYear",schoolYear);
+            formData.append("collegeProgram",collegeProgram);
+
+            console.log(collegeProgram);
 
             const response = await fetch("http://localhost:3030/profile-registration",
                 {
@@ -227,6 +241,12 @@ const Profile = () => {
                                     name="school"
                                     id="school"
                                     setValue={setSchool}
+                                />
+                                <Input 
+                                    placeholder="College Program....."
+                                    name="collegeProgram"
+                                    id="collegeProgram"
+                                    setValue={setCollegeProgram}
                                 />
                                 <FormProfile
                                     userType={userType}
