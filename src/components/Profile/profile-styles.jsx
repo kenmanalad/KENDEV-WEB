@@ -33,9 +33,9 @@ const responsiveStyle = (screenWidth,values) => {
 export const profileDivStyle = (screenWidth) => {
 
     //flex justify-evenly p-4 rounded shadow bg-white
-    let weightValues = ["w-2/3","w-2/5","w-1/2"];
+    let widthValues = ["w-2/3","w-2/5","w-1/2"];
 
-    let weight = responsiveStyle(screenWidth, weightValues);
+    let width = responsiveStyle(screenWidth, widthValues);
 
     let flexValues = ["flex-row","flex-row","flex-row","flex-col"];
 
@@ -47,7 +47,7 @@ export const profileDivStyle = (screenWidth) => {
 
     let additionalStyle = "flex p-4 rounded shadow bg-white"
 
-    return `${weight} ${flex} ${justify} ${additionalStyle}`;
+    return `${width} ${flex} ${justify} ${additionalStyle}`;
 
 }
 export const profileNameStyle = (screenWidth) => {
@@ -69,12 +69,12 @@ export const profilePicStyle = (screenWidth) => {
 
     let height = responsiveStyle(screenWidth,heightValues);
 
-    let weightValues = ["w-4/5","w-3/4","w-4/5","w-24"];
+    let widthValues = ["w-4/5","w-3/4","w-4/5","w-24"];
 
-    let weight = responsiveStyle(screenWidth, weightValues);
+    let width = responsiveStyle(screenWidth, widthValues);
 
     let additionalStyle = "rounded-lg shadow";
 
-    return `${height} ${weight} ${additionalStyle}`;
+    return `${height} ${width} ${additionalStyle}`;
 
 }
