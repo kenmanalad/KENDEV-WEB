@@ -23,8 +23,6 @@ const Profile = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [file, setFile] = useState(null);
-    const [fileName, setFileName] = useState("");
-    const [fileLocation, setFileLocation] = useState("");
     const [userType,setUserType] = useState();
     const [school,setSchool] = useState();
     const [nonITJob, setNonITJob] = useState();
@@ -75,7 +73,6 @@ const Profile = () => {
 
 
             const formData = new FormData();
-            console.log(userType);
 
             //These inputs can't be null
             formData.append("firstName",firstName);
@@ -91,7 +88,6 @@ const Profile = () => {
             formData.append("schoolYear",schoolYear);
             formData.append("collegeProgram",collegeProgram);
 
-            console.log(collegeProgram);
 
             const response = await fetch("http://localhost:3030/profile-registration",
                 {

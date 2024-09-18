@@ -2,6 +2,8 @@ import { useEffect, useState , useCallback} from "react";
 import { MdVerified } from "react-icons/md";
 import { TiUserAdd } from "react-icons/ti";
 import { FaMessage } from "react-icons/fa6";
+import { FetchProfileErrorAPI } from "../Shared/Error-Handlers/profile-error";
+import { FetchError } from "../Shared/Error-Handlers/error";
 import { profileDivStyle,profilePicStyle, profileNameStyle } from "./profile-styles";
 
 const Profile = () => {
@@ -16,19 +18,13 @@ const Profile = () => {
     const [errorMessage, setErrorMessage] = useState();
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
-    
-    //Error handling for fetching profile details
-    const handleError = (error) => {
-        setErrorMessage(error.message);
-        console.error("API failed to fetch profile details.", error.message);
-    } 
 
     const handleResponse = (data) => {
         if(data.success){
             setProfile(data.profile);
         }
         else{
-            handleError(data);
+            FetchError(data, setErrorMessage);
         }
 
     }
@@ -39,7 +35,7 @@ const Profile = () => {
                 const response = await fetchProfileAPI();
                 handleResponse(response);
             }catch(error){
-                handleError(error);
+                handleResponse(error);
             }
         }
     );
@@ -57,19 +53,19 @@ const Profile = () => {
                 }
             });
 
-            const data = await response.json();
-            if(response.ok){
-                console.log(data);
-                return data;     
-            }else{
-                handleError(data);
+            if(!response.ok){
+
+                //Sets error message for specific types of errors
+                //Then throws an error
+                FetchProfileErrorAPI(setErrorMessage,response);    
             }
+
+            return await response.json();
 
         
             
        }catch(error){
-            setErrorMessage(error.message);
-            console.error("API error while fetching profile details");
+            FetchError(error, setErrorMessage);
        }
 
     }
@@ -102,14 +98,6 @@ const Profile = () => {
     );
 
 
-    console.log(screenWidth);
-
-    // const profileDivStyle = "flex justify-evenly p-4 rounded shadow w-2/5 bg-white";
-
-    const profileName = "text-2xl flex justify-center items-center"
-
-    // const profilePicStyle = "w-3/4 h-48 rounded-lg shadow"
-
     return(
         <div 
             className="flex flex-col justify-center items-center w-full h-full p-12 bg-gray-50"
@@ -117,6 +105,16 @@ const Profile = () => {
                 fontFamily: "montserrat"
             }}
         >
+            {
+                errorMessage && 
+                    <div 
+                        className="w-full p-2 bg-red-500 text-white flex justify-center items-center"
+                    >
+                        {
+                            errorMessage
+                        }
+                    </div>
+            }
             {
                 profile && 
                     <div 
@@ -186,9 +184,6 @@ const Profile = () => {
                                 className="text-sm flex pt-1 mt-1 space-x-2"
                             >
                                <div className="flex p-2 justify-evenly items-center text-white bg-blue-400 rounded-lg ">
-                                    {/* <div className="">
-
-                                    </div> */}
                                     <TiUserAdd />
                                     Connect
                                </div>
